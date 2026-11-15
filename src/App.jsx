@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import BottomNav from './components/BottomNav.jsx'
 import OfflineIndicator from './components/OfflineIndicator.jsx'
+import OnboardingModal from './components/OnboardingModal.jsx'
 import PWABadge from './components/PWABadge.jsx'
 import Home from './pages/Home.jsx'
 import Play from './pages/Play.jsx'
@@ -13,6 +15,8 @@ import SkinDetail from './pages/SkinDetail.jsx'
 import About from './pages/About.jsx'
 import Settings from './pages/Settings.jsx'
 import NotFound from './pages/NotFound.jsx'
+import usePlayer from './hooks/usePlayer.js'
+import { flushQueue } from './services/syncQueue.js'
 import './App.css'
 
 // Halaman yang tampil layar penuh tanpa bottom nav
@@ -20,10 +24,37 @@ const FULLSCREEN_PATHS = ['/play']
 
 function App() {
   const { pathname } = useLocation()
+  const { player } = usePlayer()
+  const playerId = player?.id
+
+  // Kirim ulang skor yang tertunda: saat app dibuka dan setiap kali kembali online
+  useEffect(() => {
+    if (!playerId) return undefined
+    const sync = () => flushQueue().catch(() => {})
+    sync()
+    window.addEventListener('online', sync)
+    return () => window.removeEventListener('online', sync)
+  }, [playerId])
+
+  // Kembali ke atas setiap pindah halaman
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  if (!player) {
+    return (
+      <div className="app">
+        <OfflineIndicator />
+        <OnboardingModal />
+        <PWABadge />
+      </div>
+    )
+  }
+
   const showNav = !FULLSCREEN_PATHS.includes(pathname)
 
   return (
-    <div className={`app ${showNav ? 'app--with-nav' : ''}`}>
+    <div className={`app ${showNav ? 'app--with-nav' : 'app--fullscreen'}`}>
       <OfflineIndicator />
 
       <main className="app-main">

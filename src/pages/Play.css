@@ -1,0 +1,238 @@
+/* ---------- Halaman game (layar penuh, tanpa bottom nav) ---------- */
+.play {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.play-hud {
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  grid-template-columns: 44px 1fr 1fr 44px;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.hud-stat__label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hud-stat__value {
+  font-size: 1.35rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Papan + d-pad dikelompokkan dan dipusatkan di sisa tinggi layar */
+.play-stage {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 4dvh, 36px);
+}
+
+/* Papan: selebar mungkin tapi tetap muat bersama HUD + d-pad */
+.play-board {
+  position: relative;
+  width: min(100%, 420px, calc(100dvh - 330px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  min-width: 240px;
+  aspect-ratio: 1;
+  border: 6px solid var(--border);
+  border-radius: 14px;
+  background: var(--border);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+  overflow: hidden;
+}
+
+.game-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.game-canvas canvas {
+  display: block;
+  touch-action: none;
+}
+
+.board-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  text-align: center;
+  background: rgb(23 52 4 / 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.board-overlay__title {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.board-overlay__text {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+/* ---------- D-pad ---------- */
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: repeat(3, 56px);
+  gap: 6px;
+  padding-bottom: 4px;
+}
+
+.dpad__btn {
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 4px 0 #10260a;
+  touch-action: manipulation;
+  transition: transform 0.06s ease;
+}
+
+.dpad__btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #10260a;
+  background: var(--surface-2);
+}
+
+.dpad__btn--up { grid-column: 2; grid-row: 1; }
+.dpad__btn--left { grid-column: 1; grid-row: 2; }
+.dpad__btn--right { grid-column: 3; grid-row: 2; }
+.dpad__btn--down { grid-column: 2; grid-row: 3; }
+
+/* Layar pendek (mis. HP kecil / landscape): d-pad lebih ringkas */
+@media (max-height: 640px) {
+  .play { gap: 10px; }
+  .play-board { width: min(100%, 420px, calc(100dvh - 270px)); }
+  .dpad {
+    grid-template-columns: repeat(3, 56px);
+    grid-template-rows: repeat(3, 44px);
+  }
+}
+
+/* ---------- Game over ---------- */
+.gameover {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(10 24 2 / 0.7);
+  backdrop-filter: blur(3px);
+}
+
+.gameover__card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 18px 18px;
+  text-align: center;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
+  animation: pop-in 0.25s cubic-bezier(0.2, 1.4, 0.5, 1);
+}
+
+.gameover__cause {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.gameover__title {
+  font-size: 1.9rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.gameover__score {
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.gameover__score span {
+  margin-left: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.gameover__actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.gameover__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.submit-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.submit-status a {
+  text-decoration: underline;
+  color: var(--text);
+}
+
+.submit-status.is-ok { color: var(--accent); }
+.submit-status.is-warn { color: #EFC15F; }
+.submit-status.is-error { color: #F49A99; }
+
+/* Hanya transform (tanpa opacity) supaya kartu selalu tampil penuh walau animasi tertahan */
+@keyframes pop-in {
+  from { transform: translateY(24px) scale(0.92); }
+}

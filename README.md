@@ -5,6 +5,25 @@ jangan menabrak tembok atau badan sendiri, lalu bersaing di leaderboard global.
 
 Tugas Akhir Praktikum Pemrograman Perangkat Bergerak (PPB) Ganjil 2026.
 
+## Fitur
+
+- Game ular di canvas 15×15: kontrol swipe, d-pad, atau keyboard (panah/WASD, spasi untuk jeda).
+- Apel selalu ada; buah bonus (jeruk, anggur, buah naga) muncul acak dan hilang setelah beberapa langkah.
+- Pemain tanpa login: cukup pilih username. Skor otomatis dikirim ke server setelah game over.
+- Peringkat global, riwayat permainan, detail match (rincian makanan), detail pemain.
+- 6 skin ular yang terbuka berdasarkan skor terbaik.
+- PWA: bisa dipasang di HP, tetap bisa dimainkan offline; skor offline dikirim otomatis saat online lagi.
+
+## Halaman
+
+| Menu (bottom nav) | Halaman list | Halaman detail |
+|---|---|---|
+| Main | Beranda (`/`), Game (`/play`), Pengaturan (`/settings`) | – |
+| Peringkat | `/leaderboard` | Detail Pemain `/leaderboard/:playerId` |
+| Riwayat | `/history` | Detail Match `/history/:matchId` |
+| Skin | `/skins` | Detail Skin `/skins/:skinId` |
+| Tentang | `/about` (profil aplikasi & pembuat) | – |
+
 ## Teknologi
 
 - React + Vite (JavaScript)

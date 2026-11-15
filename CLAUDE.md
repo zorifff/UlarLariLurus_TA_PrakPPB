@@ -137,19 +137,22 @@ Semua akses localStorage lewat `src/services/storage.js` dan dibungkus try/catch
 
 ```
 api/               endpoint REST (Vercel Functions): health.js, leaderboard.js, players/, matches/, skins/, foods.js
-  _lib/            db.js (koneksi Neon), http.js (json, handle, HttpError)
+  _lib/            db.js (koneksi Neon), http.js (json, handle, HttpError), validate.js
 public/            icon-192.png, icon-512.png, apple-touch-icon.png, favicon.svg
 scripts/           vite-plugin-api.js (menjalankan /api saat dev & preview)
 src/
   config/api.js            axios instance (pola Modul PWA II)
   services/                playerService.js, matchService.js, skinService.js, foodService.js,
                            leaderboardService.js, storage.js, syncQueue.js
-  game/                    engine.js, renderer.js, constants.js, input.js
-  hooks/                   usePlayer.js, useSettings.js, useOnlineStatus.js, useFetch.js
-  components/              BottomNav.jsx, PageHeader.jsx, SnakePreview.jsx, LoadingState.jsx,
-                           ErrorState.jsx, EmptyState.jsx, OnboardingModal.jsx, PWABadge.jsx
-  pages/                   Home.jsx, Play.jsx, Leaderboard.jsx, PlayerDetail.jsx, History.jsx,
-                           MatchDetail.jsx, Skins.jsx, SkinDetail.jsx, About.jsx, Settings.jsx
+  game/                    engine.js, renderer.js, constants.js (+ FALLBACK_FOODS/SKINS), input.js, sound.js
+  hooks/                   usePlayer.js, useSettings.js, useOnlineStatus.js, useFetch.js, useStoredValue.js,
+                           useMyProfile.js, usePendingMatches.js, useUnlockScore.js, useInstallPrompt.js
+  components/              BottomNav.jsx, PageHeader.jsx, SnakePreview.jsx, FoodIcon.jsx, GameCanvas.jsx,
+                           MatchListItem.jsx, LoadingState.jsx, ErrorState.jsx, EmptyState.jsx,
+                           OnboardingModal.jsx, OfflineIndicator.jsx, PWABadge.jsx
+  pages/                   Home.jsx, Play.jsx (+ Play.css), Leaderboard.jsx, PlayerDetail.jsx, History.jsx,
+                           MatchDetail.jsx, Skins.jsx, SkinDetail.jsx, About.jsx, Settings.jsx, NotFound.jsx
+  utils/                   format.js (tanggal, durasi, angka), uuid.js (fallback crypto.randomUUID)
   App.jsx  main.jsx  index.css  App.css
 db/schema.sql
 docs/ERD.md
@@ -196,6 +199,9 @@ npm run preview -- --host            # buka di HP (satu jaringan)
 ```
 
 ## Urutan pengerjaan yang disarankan
+
+Status 15 Nov 2026: langkah 1–6 sudah dikerjakan (versi 1.0.0). Sisa: isi NIM di `src/pages/About.jsx` (opsional),
+uji di HP, asistensi.
 
 1. Scaffold Vite + React, PWA config, routing, BottomNav, semua halaman kosong. Deploy awal ke Vercel.
 2. Game engine + renderer + kontrol (tanpa API) sampai enak dimainkan di HP.
