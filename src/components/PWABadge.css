@@ -1,0 +1,53 @@
+.PWABadge {
+  padding: 0;
+  margin: 0;
+  width: 0;
+  height: 0;
+}
+
+.PWABadge-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--nav-height) + 12px + env(safe-area-inset-bottom));
+  width: calc(100% - 32px);
+  max-width: calc(var(--app-max-width) - 32px);
+  z-index: 50;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  text-align: left;
+}
+
+.app:not(.app--with-nav) .PWABadge-toast {
+  bottom: calc(12px + env(safe-area-inset-bottom));
+}
+
+.PWABadge-message {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+
+.PWABadge-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.PWABadge-toast-button {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.PWABadge-toast-button:first-child:not(:last-child) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
