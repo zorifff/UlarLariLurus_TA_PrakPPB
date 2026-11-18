@@ -55,12 +55,16 @@ export function createGame({ gridSize = GRID_SIZE, foods = FALLBACK_FOODS, speed
   return {
     gridSize,
     snake,
+    prevSnake: snake,
+    prevState: null,
+    redirected: false,
     direction: 'right',
     queue: [],
     mainFood,
     bonusFoods,
     food: food && { ...food, foodId: mainFood.id },
     bonus: null, // { x, y, foodId, ticksLeft, lifetime }
+    justAte: null, // { x, y, foodId } makanan yang baru dimakan di tick ini (untuk animasi makan mulus)
     score: 0,
     foodEaten: 0,
     eaten: {}, // { [foodId]: quantity }
@@ -110,7 +114,18 @@ export function tick(state, rng = Math.random) {
   const { gridSize, snake } = state
   const delta = DIRECTIONS[direction]
   const head = { x: snake[0].x + delta.x, y: snake[0].y + delta.y }
-  const base = { ...state, direction, queue, tickCount: state.tickCount + 1, events: [] }
+  const snapshot = { ...state, prevState: null }
+  const base = {
+    ...state,
+    prevSnake: snake,
+    prevState: snapshot,
+    redirected: false,
+    direction,
+    queue,
+    justAte: null,
+    tickCount: state.tickCount + 1,
+    events: [],
+  }
 
   // Tembok
   if (head.x < 0 || head.y < 0 || head.x >= gridSize || head.y >= gridSize) {
@@ -137,11 +152,22 @@ export function tick(state, rng = Math.random) {
 
   if (eatsBonus) {
     const food = state.bonusFoods.find((f) => f.id === state.bonus.foodId)
-    next = { ...next, ...eatFood(next, food), bonus: null, events: ['bonus'] }
+    next = {
+      ...next,
+      ...eatFood(next, food),
+      bonus: null,
+      justAte: { x: head.x, y: head.y, foodId: state.bonus.foodId },
+      events: ['bonus'],
+    }
   }
 
   if (eatsMain) {
-    next = { ...next, ...eatFood(next, state.mainFood), events: ['eat'] }
+    next = {
+      ...next,
+      ...eatFood(next, state.mainFood),
+      justAte: { x: head.x, y: head.y, foodId: state.mainFood.id },
+      events: ['eat'],
+    }
     const cell = randomFreeCell(gridSize, [...next.snake, next.bonus], rng)
     next.food = cell && { ...cell, foodId: state.mainFood.id }
   }
@@ -159,4 +185,33 @@ export function tick(state, rng = Math.random) {
   }
 
   return next
+}
+
+/**
+ * Belokkan ular secara instan berdasarkan posisi sub-tick saat ini (`progress` 0..1):
+ * - Paruh awal langkah (`progress < 0.5`): alihkan langkah tick saat ini dari petak asal (`prevState`) ke arah baru.
+ * - Paruh akhir langkah (`progress >= 0.5`): selesaikan langkah ke petak depan lalu langsung mulai belok.
+ * - Input beruntun berikutnya (zig-zag cepat): masuk ke `queue` supaya tidak membatalkan belokan pertama.
+ */
+export function steerImmediate(state, direction, progress = 0, rng = Math.random) {
+  if (!DIRECTIONS[direction] || state.status !== 'running') {
+    return { state: turn(state, direction), mode: 'none' }
+  }
+
+  if (state.queue.length === 0 && direction !== state.direction && direction !== OPPOSITE[state.direction]) {
+    if (progress < 0.5 && state.prevState && !state.redirected && !state.justAte) {
+      const prevDir = state.prevState.direction
+      if (direction !== prevDir && direction !== OPPOSITE[prevDir]) {
+        const redirected = tick({ ...state.prevState, queue: [direction] }, rng)
+        return { state: { ...redirected, redirected: true }, mode: 'redirect' }
+      }
+    }
+
+    if (progress >= 0.5) {
+      const stepped = tick({ ...state, queue: [direction] }, rng)
+      return { state: { ...stepped, redirected: true }, mode: 'advance' }
+    }
+  }
+
+  return { state: turn(state, direction), mode: 'queue' }
 }

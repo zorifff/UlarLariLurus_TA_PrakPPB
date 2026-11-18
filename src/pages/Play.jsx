@@ -11,13 +11,12 @@ import {
   RotateCw,
   Trophy,
   CloudOff,
-  Check,
   AlertTriangle,
   Sparkles,
   House,
 } from 'lucide-react'
 import GameCanvas from '../components/GameCanvas.jsx'
-import { createGame, start, pause, resume, turn, tick } from '../game/engine.js'
+import { createGame, start, pause, resume, turn, tick, steerImmediate } from '../game/engine.js'
 import { GRID_SIZE, SPEED_LABELS } from '../game/constants.js'
 import { keyToDirection } from '../game/input.js'
 import { playSound, unlockAudio, vibrate } from '../game/sound.js'
@@ -141,14 +140,16 @@ function Play() {
     }
   }, [])
 
-  // ---------- Loop: dipanggil GameCanvas setiap frame ----------
+  // ---------- Loop: dipanggil GameCanvas setiap frame (mengembalikan progress 0..1 untuk interpolasi mulus) ----------
   const onFrame = useCallback(
     (now) => {
       const clock = clockRef.current
       const last = clock.last
       clock.last = now
       let g = gameRef.current
-      if (!g || g.status !== 'running' || last === null) return
+      if (!g) return 1
+      if (g.status === 'paused') return Math.min(1, clock.acc / g.tickMs)
+      if (g.status !== 'running' || last === null) return 1
 
       const dt = Math.min(now - last, 250) // hindari lompatan besar setelah tab kembali aktif
       clock.elapsed += dt
@@ -166,8 +167,12 @@ function Play() {
       gameRef.current = g
       if (changed) {
         syncHud()
-        if (g.status === 'over') finishGame(g)
+        if (g.status === 'over') {
+          finishGame(g)
+          return 1
+        }
       }
+      return Math.min(1, clock.acc / g.tickMs)
     },
     [finishGame, playEffects, syncHud],
   )
@@ -177,33 +182,59 @@ function Play() {
     (action, direction) => {
       let g = gameRef.current
       if (!g) return
-      const startGame = (state) => {
+      const startGame = (state, initialDir) => {
         unlockAudio()
         if (latest.current.settings.sound) playSound('start')
         clockRef.current.acc = 0
-        return start(state)
+        clockRef.current.last = performance.now()
+        let next = start(state)
+        if (initialDir) next = turn(next, initialDir)
+        next = tick(next)
+        if (next.events.length) playEffects(next.events)
+        return next
       }
 
       if (action === 'steer') {
         if (g.status === 'over') return
-        if (g.status === 'ready') g = startGame(g)
-        else if (g.status === 'paused') g = resume(g)
-        g = turn(g, direction)
+        if (g.status === 'ready') g = startGame(g, direction)
+        else {
+          if (g.status === 'paused') {
+            clockRef.current.last = performance.now()
+            g = resume(g)
+          }
+          const progress = Math.min(1, clockRef.current.acc / g.tickMs)
+          const { state: steered, mode } = steerImmediate(g, direction, progress)
+          g = steered
+          if (mode === 'redirect') {
+            clockRef.current.acc = Math.min(clockRef.current.acc, g.tickMs * 0.16)
+            clockRef.current.last = performance.now()
+          } else if (mode === 'advance') {
+            clockRef.current.acc = 0
+            clockRef.current.last = performance.now()
+          }
+          if (mode === 'redirect' || mode === 'advance') {
+            if (g.events.length) playEffects(g.events)
+            if (g.status === 'over') finishGame(g)
+          }
+        }
       } else if (action === 'start') {
         g = startGame(g)
       } else if (action === 'pause') {
         g = pause(g)
       } else if (action === 'resume') {
+        clockRef.current.last = performance.now()
         g = resume(g)
       } else if (action === 'toggle') {
         if (g.status === 'running') g = pause(g)
-        else if (g.status === 'paused') g = resume(g)
-        else if (g.status === 'ready') g = startGame(g)
+        else if (g.status === 'paused') {
+          clockRef.current.last = performance.now()
+          g = resume(g)
+        } else if (g.status === 'ready') g = startGame(g)
       }
       gameRef.current = g
       syncHud()
     },
-    [syncHud],
+    [finishGame, playEffects, syncHud],
   )
 
   // Keyboard
@@ -212,7 +243,7 @@ function Play() {
       const direction = keyToDirection(e.key)
       if (direction) {
         e.preventDefault()
-        control('steer', direction)
+        if (!e.repeat) control('steer', direction)
         return
       }
       const onControl = e.target instanceof HTMLElement && e.target.closest('button, a, input')
@@ -361,18 +392,11 @@ function SubmitStatus({ submit }) {
         </p>
       )
     case 'sent':
-      return (
+      return submit.matchId ? (
         <p className="submit-status is-ok">
-          <Check size={16} aria-hidden="true" /> Skor tersimpan
-          {submit.rank ? ` · peringkat #${submit.rank}` : ''}
-          {submit.matchId && (
-            <>
-              {' · '}
-              <Link to={`/history/${submit.matchId}`}>Detail Permainan</Link>
-            </>
-          )}
+          <Link to={`/history/${submit.matchId}`}>Detail Permainan</Link>
         </p>
-      )
+      ) : null
     case 'queued':
       return (
         <p className="submit-status is-warn">
@@ -394,8 +418,8 @@ function GameOver({ result, submit, onRestart }) {
   return (
     <div className="gameover" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
       <div className="gameover__card">
-        <p className="gameover__cause">{deathCauseLabel(result.deathCause)}</p>
         <h2 id="gameover-title" className="gameover__title">Game over</h2>
+        <p className="gameover__cause">{deathCauseLabel(result.deathCause)}</p>
         {result.isNewBest && (
           <span className="badge badge--gold">
             <Sparkles size={14} aria-hidden="true" /> Rekor baru!

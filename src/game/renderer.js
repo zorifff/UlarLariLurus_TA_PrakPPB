@@ -100,11 +100,12 @@ function drawEyes(ctx, cx, cy, cell, direction, dead) {
 /**
  * @param {CanvasRenderingContext2D} ctx  sudah diskalakan devicePixelRatio
  * @param {object} state  state dari engine
- * @param {{ size: number, skin?: object, foodsById: Record<string, object>, now: number }} options
+ * @param {{ size: number, skin?: object, foodsById: Record<string, object>, now: number, progress?: number }} options
  */
-export function drawGame(ctx, state, { size, skin = DEFAULT_SKIN, foodsById = {}, now = 0 }) {
+export function drawGame(ctx, state, { size, skin = DEFAULT_SKIN, foodsById = {}, now = 0, progress = 1 }) {
   const { gridSize } = state
   const cell = size / gridSize
+  const t = state.status === 'running' || state.status === 'paused' ? Math.max(0, Math.min(1, progress)) : 1
 
   // Papan kotak-kotak
   for (let y = 0; y < gridSize; y++) {
@@ -114,10 +115,39 @@ export function drawGame(ctx, state, { size, skin = DEFAULT_SKIN, foodsById = {}
     }
   }
 
+  // Makanan yang baru dimakan di tick ini: mengecil saat kepala ular melintasinya
+  if (state.justAte && t < 0.72) {
+    const eatenFood =
+      foodsById[state.justAte.foodId] ??
+      state.bonusFoods?.find((f) => f.id === state.justAte.foodId) ??
+      state.mainFood
+    if (eatenFood) {
+      const scale = t <= 0.35 ? 1 : (0.72 - t) / 0.37
+      const cx = (state.justAte.x + 0.5) * cell
+      const cy = (state.justAte.y + 0.5) * cell
+      ctx.save()
+      ctx.translate(cx, cy)
+      ctx.scale(scale, scale)
+      drawFood(ctx, eatenFood.id, eatenFood.color, 0, 0, cell)
+      ctx.restore()
+    }
+  }
+
   // Makanan utama
   if (state.food) {
     const food = foodsById[state.food.foodId] ?? state.mainFood
-    drawFood(ctx, food.id, food.color, (state.food.x + 0.5) * cell, (state.food.y + 0.5) * cell, cell)
+    const cx = (state.food.x + 0.5) * cell
+    const cy = (state.food.y + 0.5) * cell
+    const popScale = state.justAte?.foodId === state.food.foodId ? Math.min(1, t * 1.8) : 1
+    if (popScale < 1) {
+      ctx.save()
+      ctx.translate(cx, cy)
+      ctx.scale(popScale, popScale)
+      drawFood(ctx, food.id, food.color, 0, 0, cell)
+      ctx.restore()
+    } else {
+      drawFood(ctx, food.id, food.color, cx, cy, cell)
+    }
   }
 
   // Bonus: berdenyut, berkedip di 15 tick terakhir
@@ -138,15 +168,53 @@ export function drawGame(ctx, state, { size, skin = DEFAULT_SKIN, foodsById = {}
     }
   }
 
-  // Ular: dari ekor ke kepala, belang selang-seling
+  // Ular: interpolasi sub-tick (60/120 FPS) dari ekor ke kepala, belang selang-seling tanpa celah di tikungan
   const { snake } = state
+  const prevSnake = state.prevSnake ?? snake
+  const pos = snake.map((part, i) => {
+    const prev = prevSnake[i] ?? prevSnake[prevSnake.length - 1] ?? part
+    return {
+      x: prev.x + (part.x - prev.x) * t,
+      y: prev.y + (part.y - prev.y) * t,
+    }
+  })
+
   const inset = cell * 0.06
   for (let i = snake.length - 1; i >= 0; i--) {
     const part = snake[i]
+    const p = pos[i]
     const isHead = i === 0
+    const prev = prevSnake[i] ?? prevSnake[prevSnake.length - 1] ?? part
+    const next = i > 0 ? snake[i - 1] : null
+    const isCorner = Boolean(next && t < 1 && prev.x !== next.x && prev.y !== next.y)
+
+    let targetX = p.x
+    let targetY = p.y
+    if (isCorner) {
+      targetX = part.x
+      targetY = part.y
+    } else if (next) {
+      // Sambungkan sedikit ke ruas di depannya supaya badan ular menyatu mulus
+      targetX = p.x + Math.sign(pos[i - 1].x - p.x) * 0.16
+      targetY = p.y + Math.sign(pos[i - 1].y - p.y) * 0.16
+    }
+
+    const x1 = Math.min(p.x, targetX)
+    const y1 = Math.min(p.y, targetY)
+    const x2 = Math.max(p.x, targetX)
+    const y2 = Math.max(p.y, targetY)
+
     ctx.fillStyle = isHead ? skin.head_color : i % 2 === 1 ? skin.body_color : skin.body_color_alt
-    roundRect(ctx, part.x * cell + inset, part.y * cell + inset, cell - inset * 2, cell - inset * 2, cell * (isHead ? 0.34 : 0.22))
+    roundRect(
+      ctx,
+      x1 * cell + inset,
+      y1 * cell + inset,
+      (x2 - x1 + 1) * cell - inset * 2,
+      (y2 - y1 + 1) * cell - inset * 2,
+      cell * (isHead ? 0.34 : 0.22),
+    )
   }
-  const head = snake[0]
-  drawEyes(ctx, (head.x + 0.5) * cell, (head.y + 0.5) * cell, cell, state.direction, state.status === 'over')
+  const head = pos[0]
+  const eyeDirection = state.queue?.[0] ?? state.direction
+  drawEyes(ctx, (head.x + 0.5) * cell, (head.y + 0.5) * cell, cell, eyeDirection, state.status === 'over')
 }

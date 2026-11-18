@@ -44,9 +44,15 @@ function GameCanvas({ gameRef, skin, foodsById, onFrame, onDirection }) {
     let frameId
     const frame = (now) => {
       const { skin: currentSkin, foodsById: foods, onFrame: step } = propsRef.current
-      step?.(now)
+      const progress = step?.(now) ?? 1
       if (gameRef.current && sizeRef.current > 0) {
-        drawGame(ctx, gameRef.current, { size: sizeRef.current, skin: currentSkin, foodsById: foods, now })
+        drawGame(ctx, gameRef.current, {
+          size: sizeRef.current,
+          skin: currentSkin,
+          foodsById: foods,
+          now,
+          progress,
+        })
       }
       frameId = requestAnimationFrame(frame)
     }
@@ -54,8 +60,8 @@ function GameCanvas({ gameRef, skin, foodsById, onFrame, onDirection }) {
     return () => cancelAnimationFrame(frameId)
   }, [gameRef])
 
-  // Swipe
-  useEffect(() => attachSwipe(canvasRef.current, (dir) => propsRef.current.onDirection?.(dir), 20), [])
+  // Swipe (ambang 12px agar responsif instan saat jari mulai bergeser)
+  useEffect(() => attachSwipe(canvasRef.current, (dir) => propsRef.current.onDirection?.(dir), 12), [])
 
   return (
     <div className="game-canvas" ref={wrapRef}>
