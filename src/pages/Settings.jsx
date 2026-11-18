@@ -179,7 +179,7 @@ function Settings() {
         )}
         <button type="button" className="btn btn--danger btn--block" onClick={handleReset}>
           <Trash2 size={18} aria-hidden="true" />
-          Reset data lokal
+          Reset Data
         </button>
         <p className="settings-meta">
           ID pemain: <code>{player.id}</code>

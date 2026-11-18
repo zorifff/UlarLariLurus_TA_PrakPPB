@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Trash2, AlertTriangle } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { formatNumber } from '../../utils/format.js'
 
 /**
@@ -26,9 +26,6 @@ function DeleteAccountDialog({ player, loading, error, onCancel, onConfirm }) {
       onClick={(e) => e.target === e.currentTarget && !loading && onCancel()}
     >
       <div className="admin-dialog__card">
-        <span className="admin-dialog__icon">
-          <AlertTriangle size={30} aria-hidden="true" />
-        </span>
         <h2 id="delete-title" className="admin-dialog__title">
           Hapus akun <span>{player.username}</span>?
         </h2>
@@ -38,7 +35,6 @@ function DeleteAccountDialog({ player, loading, error, onCancel, onConfirm }) {
           riwayat permainan, skin, dan posisinya di peringkat. Pemain harus membuat username baru saat membuka game
           lagi.
         </p>
-        <p className="admin-dialog__warn">Tindakan ini tidak bisa dibatalkan.</p>
 
         {error && (
           <p className="form-error" role="alert">
@@ -47,10 +43,10 @@ function DeleteAccountDialog({ player, loading, error, onCancel, onConfirm }) {
         )}
 
         <div className="admin-dialog__actions">
-          <button type="button" className="btn btn--block" onClick={onCancel} disabled={loading} autoFocus>
+          <button type="button" className="btn btn--block" onClick={onCancel} disabled={loading}>
             Batal
           </button>
-          <button type="button" className="btn btn--danger-solid btn--block" onClick={onConfirm} disabled={loading}>
+          <button type="button" className="btn btn--block admin-dialog__delete" onClick={onConfirm} disabled={loading}>
             {loading ? (
               <span className="spinner spinner--small" aria-hidden="true" />
             ) : (

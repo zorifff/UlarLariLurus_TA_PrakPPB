@@ -3,14 +3,14 @@
   padding-bottom: calc(env(safe-area-inset-bottom) + 28px);
 }
 
-.onboarding__notice {
-  width: 100%;
-  text-align: left;
-}
-
 .admin-eye {
   width: 48px;
   height: 48px;
+}
+
+.field__input.admin-password-input.is-error,
+.field__input.admin-password-input.is-error:focus {
+  border-color: var(--snake-orange);
 }
 
 /* Ringkasan skin di dashboard admin */
@@ -104,38 +104,23 @@
   opacity: 0.9;
 }
 
-.icon-button--danger {
-  border-color: rgb(226 75 74 / 0.45);
-  color: #F7B5B4;
-}
-
-.icon-button--danger:active {
-  background: rgb(226 75 74 / 0.2);
+.icon-button.icon-button--danger {
+  border-color: var(--border);
+  color: var(--snake-orange);
 }
 
 /* Zona berbahaya di detail akun */
-.admin-danger-title {
-  color: #F7B5B4;
+.section-title.admin-danger-title {
+  color: var(--snake-orange);
 }
 
-.admin-danger {
+.card.admin-danger {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border-color: rgb(226 75 74 / 0.5);
+  border-color: var(--border);
   font-size: 0.9rem;
   color: var(--text-muted);
-}
-
-.btn--danger-solid {
-  background: var(--danger);
-  border-color: var(--danger);
-  color: #fff;
-  box-shadow: 0 4px 0 #9e2928;
-}
-
-.btn--danger-solid:active:not(:disabled) {
-  box-shadow: 0 2px 0 #9e2928;
 }
 
 /* Dialog konfirmasi hapus akun (gaya seragam dengan modal gameover) */
@@ -165,17 +150,6 @@
   box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
 }
 
-.admin-dialog__icon {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: rgb(226 75 74 / 0.16);
-  border: 1px solid rgb(226 75 74 / 0.45);
-  color: #F7B5B4;
-}
-
 .admin-dialog__title {
   font-size: 1.25rem;
   font-weight: 900;
@@ -196,16 +170,14 @@
   color: var(--text);
 }
 
-.admin-dialog__warn {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #F7B5B4;
-}
-
 .admin-dialog__actions {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-top: 4px;
+}
+
+.btn.admin-dialog__delete {
+  color: var(--snake-orange);
 }

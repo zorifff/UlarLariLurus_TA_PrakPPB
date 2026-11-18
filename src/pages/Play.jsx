@@ -368,7 +368,7 @@ function SubmitStatus({ submit }) {
           {submit.matchId && (
             <>
               {' · '}
-              <Link to={`/history/${submit.matchId}`}>detail</Link>
+              <Link to={`/history/${submit.matchId}`}>Detail Permainan</Link>
             </>
           )}
         </p>

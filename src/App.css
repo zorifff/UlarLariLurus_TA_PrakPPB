@@ -617,6 +617,11 @@ a.list-row:active {
   color: var(--text-muted);
 }
 
+.onboarding__notice {
+  color: var(--snake-orange);
+  font-size: 0.9rem;
+}
+
 .onboarding__form {
   width: 100%;
   display: flex;

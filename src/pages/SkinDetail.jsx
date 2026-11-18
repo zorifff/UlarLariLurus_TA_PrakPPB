@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Check, Lock, Sparkles } from 'lucide-react'
+import { Check, Lock } from 'lucide-react'
 import PageHeader from '../components/PageHeader.jsx'
 import ErrorState from '../components/ErrorState.jsx'
 import LoadingState from '../components/LoadingState.jsx'
@@ -63,7 +63,6 @@ function SkinDetail() {
     } else {
       button = (
         <button type="button" className="btn btn--primary btn--block" onClick={applySkin} disabled={action.loading}>
-          <Sparkles size={20} aria-hidden="true" />
           {action.loading ? 'Menyimpan…' : 'Pakai skin ini'}
         </button>
       )

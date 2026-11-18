@@ -19,8 +19,8 @@ function AdminApp() {
       <main className="app-main">
         {session ? (
           <Routes>
-            <Route index element={<AdminDashboard />} />
-            <Route path="players/:playerId" element={<AdminPlayerDetail />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/players/:playerId" element={<AdminPlayerDetail />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Routes>
         ) : (

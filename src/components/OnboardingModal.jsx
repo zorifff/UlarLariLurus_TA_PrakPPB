@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowRight, UserX } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { registerPlayer } from '../services/playerService.js'
 import { KEYS, remove, setLocalPlayer } from '../services/storage.js'
 import useStoredValue from '../hooks/useStoredValue.js'
@@ -47,12 +47,8 @@ function OnboardingModal() {
         </p>
 
         {removed && (
-          <p className="banner banner--warn onboarding__notice" role="status">
-            <UserX size={20} aria-hidden="true" />
-            <span>
-              Akun {removed.username ? <strong>{removed.username}</strong> : 'kamu'} telah dihapus oleh admin
-              beserta semua progresnya. Buat username baru untuk main lagi.
-            </span>
+          <p className="onboarding__notice" role="status">
+            Username &ldquo;{removed.username || 'kamu'}&rdquo; dihapus oleh Admin, buat username baru untuk bermain
           </p>
         )}
 

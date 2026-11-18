@@ -176,7 +176,7 @@ function AdminPlayerDetail() {
           <p className="settings-meta">
             ID akun: <code>{player.id}</code>
           </p>
-          <button type="button" className="btn btn--danger btn--block" onClick={() => setConfirming(true)}>
+          <button type="button" className="btn btn--block admin-dialog__delete" onClick={() => setConfirming(true)}>
             <Trash2 size={18} aria-hidden="true" />
             Hapus akun ini
           </button>
