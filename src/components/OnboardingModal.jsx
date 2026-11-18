@@ -1,15 +1,17 @@
 import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, UserX } from 'lucide-react'
 import { registerPlayer } from '../services/playerService.js'
-import { setLocalPlayer } from '../services/storage.js'
+import { KEYS, remove, setLocalPlayer } from '../services/storage.js'
+import useStoredValue from '../hooks/useStoredValue.js'
 import { uuid } from '../utils/uuid.js'
 
 export const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/
 
-/** Layar onboarding: muncul kalau belum ada pemain di perangkat ini. */
+/** Layar onboarding: muncul kalau belum ada pemain di perangkat ini (atau akunnya dihapus admin). */
 function OnboardingModal() {
   const [username, setUsername] = useState('')
   const [status, setStatus] = useState({ loading: false, error: null })
+  const removed = useStoredValue(KEYS.accountRemoved, null)
 
   const trimmed = username.trim()
   const valid = USERNAME_PATTERN.test(trimmed)
@@ -22,6 +24,7 @@ function OnboardingModal() {
     const id = uuid()
     try {
       const player = await registerPlayer(id, trimmed)
+      remove(KEYS.accountRemoved)
       setLocalPlayer({ id: player.id, username: player.username, skinId: player.skin_id })
     } catch (err) {
       const message =
@@ -40,8 +43,18 @@ function OnboardingModal() {
         <img className="onboarding__logo" src="/favicon.svg" alt="" width="88" height="88" />
         <h1 id="onboarding-title" className="onboarding__title">Selamat datang di Ularlarilurus!</h1>
         <p className="onboarding__text">
-          Pilih nama untuk ditampilkan di papan peringkat. Tidak perlu email atau kata sandi.
+          Buat nama untuk ditampilkan di papan peringkat
         </p>
+
+        {removed && (
+          <p className="banner banner--warn onboarding__notice" role="status">
+            <UserX size={20} aria-hidden="true" />
+            <span>
+              Akun {removed.username ? <strong>{removed.username}</strong> : 'kamu'} telah dihapus oleh admin
+              beserta semua progresnya. Buat username baru untuk main lagi.
+            </span>
+          </p>
+        )}
 
         <form className="onboarding__form" onSubmit={handleSubmit} noValidate>
           <label className="field">

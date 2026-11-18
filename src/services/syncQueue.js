@@ -3,7 +3,7 @@
 // saat event `online` atau saat aplikasi dibuka. Aman dikirim ulang: POST /matches idempoten.
 import { getPendingMatches, setPendingMatches } from './storage.js'
 import { submitMatch } from './matchService.js'
-import { ensureRegistered } from './playerService.js'
+import { ensureRegistered, isAccountGone } from './playerService.js'
 
 export function enqueueMatch(payload) {
   const pending = getPendingMatches()
@@ -33,7 +33,7 @@ export function flushQueue() {
       return { sent, dropped, remaining: pending.length }
     }
 
-    // Pastikan pemain terdaftar di server dulu (mis. database pernah direset)
+    // Pastikan akun masih ada di server dulu (kalau sudah dihapus admin, antrean ikut dibuang)
     const player = await ensureRegistered().catch(() => null)
     if (!player) return { sent, dropped, remaining: pending.length }
 
@@ -44,6 +44,7 @@ export function flushQueue() {
         sent++
       } catch (err) {
         if (err.isRetryable) break
+        if (isAccountGone(err)) return { sent, dropped, remaining: 0 } // akun dihapus: antrean ikut dibuang
         removePending(match.id)
         dropped++
       }

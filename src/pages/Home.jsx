@@ -36,7 +36,6 @@ function Home() {
       <section className="home__hero">
         <img className="home__logo" src="/favicon.svg" alt="" width="112" height="112" />
         <h1 className="home__title">Ularlarilurus</h1>
-        <p className="home__tagline">Makan buahnya, jangan tabrak apa-apa.</p>
         <Link to="/play" className="btn btn--primary btn--large home__play">
           <Play size={26} fill="currentColor" aria-hidden="true" />
           Main

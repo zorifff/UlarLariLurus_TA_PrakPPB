@@ -4,7 +4,7 @@ import useFetch from './useFetch.js'
 
 /**
  * Profil pemain saya dari server (best_score, rank, skin, statistik).
- * Sekaligus memastikan pemain terdaftar (daftar ulang otomatis kalau database pernah direset).
+ * Sekaligus memastikan akun masih ada (kalau sudah dihapus admin, onboarding muncul lagi).
  */
 function useMyProfile() {
   const { player } = usePlayer()

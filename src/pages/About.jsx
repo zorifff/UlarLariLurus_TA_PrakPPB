@@ -9,7 +9,7 @@ import { getGameFoods } from '../services/foodService.js'
 const CREATOR = {
   name: 'Muhammad Zhorif Zaidaan Ramadhan',
   nim: '21120124140140',
-  course: 'Praktikum Pemrograman Perangkat Bergerak · Ganjil 2026',
+  course: 'Praktikum Pemrograman Perangkat Bergerak',
   github: 'https://github.com/zorifff',
   repo: 'https://github.com/zorifff/UlarLariLurus_TA_PrakPPB',
 }
@@ -97,10 +97,6 @@ function About() {
           <ExternalLink size={14} aria-hidden="true" />
         </a>
       </div>
-
-      <p className="about-footer">
-        Dibuat dengan React, Vite, vite-plugin-pwa, Vercel Functions, dan Neon Postgres.
-      </p>
     </div>
   )
 }

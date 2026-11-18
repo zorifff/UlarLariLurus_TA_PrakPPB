@@ -1,0 +1,211 @@
+/* ---------- Admin ---------- */
+.app--admin .app-main {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 28px);
+}
+
+.onboarding__notice {
+  width: 100%;
+  text-align: left;
+}
+
+.admin-eye {
+  width: 48px;
+  height: 48px;
+}
+
+/* Ringkasan skin di dashboard admin */
+.admin-skins {
+  margin: 0;
+  padding: 12px 14px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-skins__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-skins__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-skins__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.admin-skins__name {
+  font-weight: 700;
+}
+
+.admin-skins__count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress--thin {
+  height: 8px;
+}
+
+/* Pencarian & pengurutan daftar akun */
+.admin-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.admin-search__icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.admin-search .field__input {
+  width: 100%;
+  padding-left: 40px;
+}
+
+/* Baris akun di dashboard admin */
+.admin-row {
+  padding: 8px 10px 8px 12px;
+  gap: 10px;
+}
+
+.admin-row__link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-row__sub {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  opacity: 0.9;
+}
+
+.icon-button--danger {
+  border-color: rgb(226 75 74 / 0.45);
+  color: #F7B5B4;
+}
+
+.icon-button--danger:active {
+  background: rgb(226 75 74 / 0.2);
+}
+
+/* Zona berbahaya di detail akun */
+.admin-danger-title {
+  color: #F7B5B4;
+}
+
+.admin-danger {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-color: rgb(226 75 74 / 0.5);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.btn--danger-solid {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+  box-shadow: 0 4px 0 #9e2928;
+}
+
+.btn--danger-solid:active:not(:disabled) {
+  box-shadow: 0 2px 0 #9e2928;
+}
+
+/* Dialog konfirmasi hapus akun (gaya seragam dengan modal gameover) */
+.admin-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(10 24 2 / 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.admin-dialog__card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 18px 18px;
+  text-align: center;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
+}
+
+.admin-dialog__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgb(226 75 74 / 0.16);
+  border: 1px solid rgb(226 75 74 / 0.45);
+  color: #F7B5B4;
+}
+
+.admin-dialog__title {
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.admin-dialog__title span {
+  color: var(--accent);
+}
+
+.admin-dialog__text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.admin-dialog__text strong {
+  color: var(--text);
+}
+
+.admin-dialog__warn {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #F7B5B4;
+}
+
+.admin-dialog__actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}

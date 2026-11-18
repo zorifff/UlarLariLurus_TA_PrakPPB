@@ -64,8 +64,9 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
-            // GET ke API sendiri (leaderboard, skin, makanan, dst.)
-            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/api/'),
+            // GET ke API sendiri (leaderboard, skin, makanan, dst.). Endpoint admin tidak pernah di-cache.
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin && url.pathname.startsWith('/api/') && !url.pathname.startsWith('/api/admin'),
             method: 'GET',
             handler: 'NetworkFirst',
             options: {

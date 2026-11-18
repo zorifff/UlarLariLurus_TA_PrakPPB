@@ -115,6 +115,10 @@ Error: status HTTP 4xx/5xx + body `{ "error": { "code": "...", "message": "..." 
 | Daftar skin | `GET /api/skins` | `api/skins/index.js` | urut `sort_order` |
 | Detail skin | `GET /api/skins/{id}` | `api/skins/[id].js` | |
 | Daftar makanan | `GET /api/foods` | `api/foods.js` | urut `sort_order`; `spawn_chance` dikirim sebagai number |
+| Login admin | `POST /api/admin` body `{ password }` | `api/admin/index.js` | cek `ADMIN_PASSWORD`; balas `{ token, expires_at }` |
+| Ringkasan & daftar akun (admin) | `GET /api/admin` (Bearer token) | `api/admin/index.js` | ringkasan global, pemakaian skin, daftar semua akun + peringkat terbaru |
+| Detail akun (admin) | `GET /api/admin/players/{id}` (Bearer token) | `api/admin/players/[id].js` | profil, statistik lengkap, rincian makanan, 20 match terakhir |
+| Hapus akun (admin) | `DELETE /api/admin/players/{id}` (Bearer token) | `api/admin/players/[id].js` | hapus pemain + semua match & rincian makanan (`on delete cascade`) |
 
 `id` pemain dan match dibuat di client (`crypto.randomUUID()`). Karena `POST /api/matches` idempoten,
 match yang disimpan offline bisa dikirim ulang tanpa duplikat.

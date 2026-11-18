@@ -615,7 +615,6 @@ a.list-row:active {
 
 .onboarding__text {
   color: var(--text-muted);
-  max-width: 34ch;
 }
 
 .onboarding__form {

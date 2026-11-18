@@ -1,5 +1,5 @@
 import api from '../config/api.js'
-import { getLocalPlayer, setLocalPlayer, remove, KEYS, updateLocalBest } from './storage.js'
+import { getLocalPlayer, setLocalPlayer, updateLocalBest, wipeRemovedAccount } from './storage.js'
 
 /** POST /players — daftarkan pemain baru (id dibuat di client). */
 export const registerPlayer = (id, username) => api.post('/players', { id, username })
@@ -11,13 +11,33 @@ export const checkUsername = (username) => api.get('/players', { params: { usern
 export const getPlayer = (id) => api.get(`/players/${id}`)
 
 /** PATCH /players/:id — hanya { username } dan/atau { skin_id } */
-export const updatePlayer = (id, patch) => api.patch(`/players/${id}`, patch)
+export const updatePlayer = (id, patch) =>
+  api.patch(`/players/${id}`, patch).catch((err) => {
+    if (isAccountGone(err)) handleAccountRemoved(id)
+    throw err
+  })
+
+/**
+ * Error API yang berarti akun pemain sudah tidak ada di server (dihapus admin).
+ * Sengaja memakai kode khusus, bukan sekadar status 404, supaya salah routing tidak menghapus data pemain.
+ */
+export const isAccountGone = (err) => err?.status === 404 && err?.code === 'PLAYER_NOT_FOUND'
+
+/**
+ * Akun `playerId` sudah dihapus admin: hapus progres lokal → layar onboarding muncul lagi.
+ * Hanya berlaku kalau identitas lokal masih akun yang sama (hindari menghapus akun baru
+ * karena respons lama yang datang terlambat).
+ */
+export function handleAccountRemoved(playerId) {
+  const local = getLocalPlayer()
+  if (local && local.id === playerId) wipeRemovedAccount(local.username)
+}
 
 /**
  * Samakan identitas lokal dengan server:
  * - pemain ada → sinkronkan username/skin lokal, simpan skor terbaik
- * - pemain tidak ada (mis. database direset) → daftarkan ulang dengan id & username yang sama
- * - username ternyata sudah dipakai orang lain → hapus identitas lokal (onboarding muncul lagi)
+ * - pemain tidak ada (dihapus admin / database direset) → hapus progres lokal, pemain diminta
+ *   membuat username baru seperti saat pertama main. Mengembalikan null.
  */
 export async function ensureRegistered() {
   const local = getLocalPlayer()
@@ -28,19 +48,9 @@ export async function ensureRegistered() {
     syncLocal(local, remote)
     return remote
   } catch (err) {
-    if (err.status !== 404) throw err
-  }
-
-  try {
-    const created = await registerPlayer(local.id, local.username)
-    syncLocal(local, created)
-    return created
-  } catch (err) {
-    if (err.status === 409) {
-      remove(KEYS.player)
-      return null
-    }
-    throw err
+    if (!isAccountGone(err)) throw err
+    handleAccountRemoved(local.id)
+    return null
   }
 }
 

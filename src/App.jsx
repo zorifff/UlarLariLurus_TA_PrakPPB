@@ -15,7 +15,9 @@ import SkinDetail from './pages/SkinDetail.jsx'
 import About from './pages/About.jsx'
 import Settings from './pages/Settings.jsx'
 import NotFound from './pages/NotFound.jsx'
+import AdminApp from './pages/admin/AdminApp.jsx'
 import usePlayer from './hooks/usePlayer.js'
+import useAccountGuard from './hooks/useAccountGuard.js'
 import { flushQueue } from './services/syncQueue.js'
 import './App.css'
 
@@ -25,7 +27,11 @@ const FULLSCREEN_PATHS = ['/play']
 function App() {
   const { pathname } = useLocation()
   const { player } = usePlayer()
-  const playerId = player?.id
+  const isAdminPath = pathname === '/admin' || pathname.startsWith('/admin/')
+  const playerId = isAdminPath ? null : player?.id
+
+  // Pastikan akun pemain masih ada di server (kalau dihapus admin → kembali ke onboarding)
+  useAccountGuard(playerId, pathname)
 
   // Kirim ulang skor yang tertunda: saat app dibuka dan setiap kali kembali online
   useEffect(() => {
@@ -40,6 +46,16 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [pathname])
+
+  // Halaman admin (/admin) punya alur login sendiri (kata sandi), tidak butuh username pemain
+  if (isAdminPath) {
+    return (
+      <>
+        <AdminApp />
+        <PWABadge />
+      </>
+    )
+  }
 
   if (!player) {
     return (

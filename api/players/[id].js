@@ -4,7 +4,8 @@ import { getSql } from '../_lib/db.js'
 import { handle, json, readJson, lastPathSegment, HttpError } from '../_lib/http.js'
 import { isUuid, requireUsername, requireInt } from '../_lib/validate.js'
 
-const notFound = () => new HttpError(404, 'NOT_FOUND', 'Pemain tidak ditemukan.')
+// Kode khusus PLAYER_NOT_FOUND: client memakainya untuk tahu akun sudah dihapus admin.
+const notFound = () => new HttpError(404, 'PLAYER_NOT_FOUND', 'Pemain tidak ditemukan.')
 
 async function findPlayer(sql, id) {
   const [player] = await sql`

@@ -6,6 +6,7 @@ export const KEYS = {
   settings: 'ull:settings',
   pendingMatches: 'ull:pendingMatches',
   localBest: 'ull:localBest',
+  accountRemoved: 'ull:accountRemoved',
 }
 
 export const DEFAULT_SETTINGS = Object.freeze({ sound: true, vibrate: true, speed: 'normal' })
@@ -110,4 +111,70 @@ export function updateLocalBest(score) {
 /** Hapus semua data lokal aplikasi (dipakai di Pengaturan > Reset). */
 export function clearAll() {
   Object.values(KEYS).forEach(remove)
+}
+
+/**
+ * Akun dihapus admin: hapus semua progres pemain di perangkat ini (identitas + skin, skor terbaik lokal,
+ * antrean skor offline), lalu tinggalkan penanda supaya layar onboarding bisa menjelaskan kenapa harus
+ * membuat username lagi. Pengaturan perangkat (suara, getar, kecepatan) dibiarkan.
+ */
+export function wipeRemovedAccount(username) {
+  ;[KEYS.pendingMatches, KEYS.localBest].forEach(remove)
+  write(KEYS.accountRemoved, { username: username ?? null, at: new Date().toISOString() })
+  remove(KEYS.player) // terakhir: memicu App menampilkan onboarding
+}
+
+// ---------- Sesi admin (sessionStorage: otomatis hilang saat tab/browser ditutup) ----------
+
+const ADMIN_TOKEN_KEY = 'ull:adminToken'
+
+/** `{ token, expires_at }` atau null kalau belum login / sudah kedaluwarsa */
+export function getAdminSession() {
+  const session = readSession(ADMIN_TOKEN_KEY)
+  if (!session?.token || !(new Date(session.expires_at).getTime() > Date.now())) return null
+  return session
+}
+
+export function setAdminSession(session) {
+  writeSession(ADMIN_TOKEN_KEY, session)
+}
+
+export function clearAdminSession() {
+  writeSession(ADMIN_TOKEN_KEY, null)
+}
+
+export const subscribeAdminSession = (callback) => subscribe(ADMIN_TOKEN_KEY, callback)
+
+const sessionMemory = new Map()
+const sessionCache = new Map()
+
+function readSession(key) {
+  let raw = sessionMemory.has(key) ? sessionMemory.get(key) : null
+  try {
+    raw = window.sessionStorage.getItem(key) ?? raw
+  } catch {
+    // abaikan, pakai memori
+  }
+  const cached = sessionCache.get(key)
+  if (cached && cached.raw === raw) return cached.value
+  let value = null
+  try {
+    value = raw === null ? null : JSON.parse(raw)
+  } catch {
+    value = null
+  }
+  sessionCache.set(key, { raw, value })
+  return value
+}
+
+function writeSession(key, value) {
+  try {
+    if (value === null) window.sessionStorage.removeItem(key)
+    else window.sessionStorage.setItem(key, JSON.stringify(value))
+    sessionMemory.delete(key)
+  } catch {
+    if (value === null) sessionMemory.delete(key)
+    else sessionMemory.set(key, JSON.stringify(value))
+  }
+  emit(key)
 }

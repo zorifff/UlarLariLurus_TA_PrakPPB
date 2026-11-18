@@ -89,7 +89,9 @@ Bottom nav tampil di semua halaman **kecuali** `/play` (game layar penuh) dan ha
 | `/skins/:skinId` | Detail Skin | Preview ular berwarna skin, deskripsi, syarat buka, tombol **Pakai skin ini** | `skins`; `PATCH players` |
 | `/about` | Tentang | Deskripsi game, cara main, panduan makanan (dari `foods`), versi, profil pembuat, link GitHub | `foods` |
 | `/settings` | Pengaturan | Ganti username, suara on/off, getar on/off, kecepatan awal (Santai/Normal/Cepat), reset data lokal | localStorage + `PATCH players` |
-| — | Onboarding (modal) | Muncul saat belum ada username: input username → `POST players` | `players` |
+| `/admin` | Admin (login & dashboard) | Login kata sandi (`ADMIN_PASSWORD`), statistik global, pemakaian skin, daftar semua akun + cari/urut + hapus akun | `/api/admin` |
+| `/admin/players/:playerId` | Detail Akun (admin) | Statistik lengkap akun, rincian makanan, 20 match terakhir, hapus akun | `/api/admin/players/:id` |
+| — | Onboarding (modal) | Muncul saat belum ada username (atau akun dihapus admin): input username → `POST players` | `players` |
 
 ## Spesifikasi game
 

@@ -62,6 +62,10 @@ export const POST = handle(async (request) => {
   const m = match
   const sql = getSql()
 
+  // Akun bisa saja sudah dihapus admin: balas 404 khusus supaya client meminta username baru.
+  const [owner] = await sql`select id from players where id = ${m.player_id}`
+  if (!owner) throw new HttpError(404, 'PLAYER_NOT_FOUND', 'Akun pemain tidak ditemukan (mungkin sudah dihapus).')
+
   // Transaksi: insert match (abaikan kalau id sudah ada) + rincian makanan, lalu baca hasil.
   // Trigger trg_matches_after_insert mengupdate statistik pemain secara otomatis.
   const [inserted, , playerRows] = await sql.transaction([
