@@ -18,6 +18,7 @@ import NotFound from './pages/NotFound.jsx'
 import AdminApp from './pages/admin/AdminApp.jsx'
 import usePlayer from './hooks/usePlayer.js'
 import useAccountGuard from './hooks/useAccountGuard.js'
+import useSwipeNav from './hooks/useSwipeNav.js'
 import { flushQueue } from './services/syncQueue.js'
 import './App.css'
 
@@ -32,6 +33,7 @@ function App() {
 
   // Pastikan akun pemain masih ada di server (kalau dihapus admin → kembali ke onboarding)
   useAccountGuard(playerId, pathname)
+  const { slideClass, onClickCapture } = useSwipeNav(isAdminPath || !player ? '' : pathname)
 
   // Kirim ulang skor yang tertunda: saat app dibuka dan setiap kali kembali online
   useEffect(() => {
@@ -73,7 +75,7 @@ function App() {
     <div className={`app ${showNav ? 'app--with-nav' : 'app--fullscreen'}`}>
       <OfflineIndicator />
 
-      <main className="app-main">
+      <main className={`app-main${slideClass ? ` ${slideClass}` : ''}`} onClickCapture={onClickCapture}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/play" element={<Play />} />

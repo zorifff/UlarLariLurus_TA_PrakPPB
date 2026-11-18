@@ -22,7 +22,7 @@ export const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' }
 
 export const FALLBACK_FOODS = [
   { id: 'apple', name: 'Apel', description: 'Makanan utama. Selalu ada satu di arena.', points: 10, color: '#E24B4A', spawn_chance: 1, lifetime_ticks: null, is_bonus: false, sort_order: 1 },
-  { id: 'orange', name: 'Jeruk', description: 'Bonus kecil kecilan, hilang setelah beberapa saat.', points: 20, color: '#EF9F27', spawn_chance: 0.2, lifetime_ticks: 50, is_bonus: true, sort_order: 2 },
+  { id: 'orange', name: 'Jeruk', description: 'Bonus kecil kecilan. Hilang setelah beberapa saat.', points: 20, color: '#EF9F27', spawn_chance: 0.2, lifetime_ticks: 50, is_bonus: true, sort_order: 2 },
   { id: 'grape', name: 'Anggur', description: 'Bonus bernilai tinggi. Cepat, sebelum hilang!', points: 30, color: '#7F77DD', spawn_chance: 0.12, lifetime_ticks: 40, is_bonus: true, sort_order: 3 },
   { id: 'dragonfruit', name: 'Buah Naga', description: 'Bonus langka dengan poin terbesar.', points: 50, color: '#D4537E', spawn_chance: 0.05, lifetime_ticks: 30, is_bonus: true, sort_order: 4 },
 ]

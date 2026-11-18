@@ -134,6 +134,6 @@ select setval(pg_get_serial_sequence('public.skins', 'id'), (select max(id) from
 
 insert into public.foods (id, name, description, points, color, spawn_chance, lifetime_ticks, is_bonus, sort_order) values
   ('apple',       'Apel',      'Makanan utama. Selalu ada satu di arena.',                      10, '#E24B4A', 1.00, null, false, 1),
-  ('orange',      'Jeruk',     'Bonus kecil kecilan, hilang setelah beberapa saat.',            20, '#EF9F27', 0.20,   50, true,  2),
+  ('orange',      'Jeruk',     'Bonus kecil kecilan. Hilang setelah beberapa saat.',            20, '#EF9F27', 0.20,   50, true,  2),
   ('grape',       'Anggur',    'Bonus bernilai tinggi. Cepat, sebelum hilang!',                 30, '#7F77DD', 0.12,   40, true,  3),
   ('dragonfruit', 'Buah Naga', 'Bonus langka dengan poin terbesar.',                            50, '#D4537E', 0.05,   30, true,  4);
